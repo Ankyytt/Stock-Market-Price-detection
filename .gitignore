@@ -1,1 +1,4 @@
-venv/ 
+venv/
+
+# git-filter-repo tools
+git-filter-repo.*
