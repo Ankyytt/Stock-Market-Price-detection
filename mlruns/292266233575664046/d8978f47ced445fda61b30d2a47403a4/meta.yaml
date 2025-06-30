@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/Users/OmniXXX/Desktop/Project/mlruns/292266233575664046/d8978f47ced445fda61b30d2a47403a4/artifacts
+end_time: 1749815139577
+entry_point_name: ''
+experiment_id: '292266233575664046'
+lifecycle_stage: active
+run_id: d8978f47ced445fda61b30d2a47403a4
+run_name: ARIMA
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1749815139357
+status: 3
+tags: []
+user_id: OmniXXX

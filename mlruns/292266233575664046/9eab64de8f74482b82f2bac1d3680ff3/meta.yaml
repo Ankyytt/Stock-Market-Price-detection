@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/Users/OmniXXX/Desktop/Project/mlruns/292266233575664046/9eab64de8f74482b82f2bac1d3680ff3/artifacts
+end_time: 1749815141664
+entry_point_name: ''
+experiment_id: '292266233575664046'
+lifecycle_stage: active
+run_id: 9eab64de8f74482b82f2bac1d3680ff3
+run_name: LSTM
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1749815139584
+status: 3
+tags: []
+user_id: OmniXXX
