@@ -4,7 +4,9 @@ from datetime import datetime, timedelta
 
 def evaluate_models():
     from stock_forecast_project.evaluate import evaluate_arima, evaluate_lstm
+    print("Starting ARIMA evaluation...")
     evaluate_arima()
+    print("Starting LSTM evaluation...")
     evaluate_lstm()
 
 default_args = {
