@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Stock Price Forecasting</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <div class="container">
+        <h1>Stock Price Forecasting</h1>
+        <form id="forecastForm">
+            <label for="ticker">Stock Ticker:</label>
+            <input type="text" id="ticker" name="ticker" value="TSLA" required />
+
+            <label for="start_date">Start Date (YYYY-MM-DD):</label>
+            <input type="date" id="start_date" name="start_date" value="2023-12-01" required />
+
+            <label for="end_date">End Date (YYYY-MM-DD):</label>
+            <input type="date" id="end_date" name="end_date" value="2024-06-01" required />
+
+            <label for="forecastDays">Forecast Days:</label>
+            <input type="number" id="forecastDays" name="forecastDays" min="1" max="60" value="14" />
+
+            <button type="submit">Fetch Forecast</button>
+        </form>
+
+        <div class="chart-container">
+            <h2 class="chart-title">Historic Close Price</h2>
+            <canvas id="historicChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h2 class="chart-title">Predicted Close Price</h2>
+            <canvas id="forecastChart"></canvas>
+        </div>
+
+        <div id="result"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const form = document.getElementById('forecastForm');
+        const historicCtx = document.getElementById('historicChart').getContext('2d');
+        const forecastCtx = document.getElementById('forecastChart').getContext('2d');
+        let historicChart, forecastChart;
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const ticker = document.getElementById('ticker').value.trim().toUpperCase();
+            const start_date = document.getElementById('start_date').value;
+            const end_date = document.getElementById('end_date').value;
+            const forecastDays = parseInt(document.getElementById('forecastDays').value);
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Loading...';
+
+            try {
+                const response = await fetch('/forecast/lstm', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ticker, start_date, end_date, forecast_days: forecastDays })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Error fetching forecast data.');
+                }
+
+                const data = await response.json();
+
+                if (!data.predictions || data.predictions.length === 0) {
+                    resultDiv.innerHTML = '<p class="error">No forecast data available.</p>';
+                    return;
+                }
+
+                // Prepare historic data for chart
+                const historicLabels = data.historic.map(item => item.date);
+                const historicValues = data.historic.map(item => item.close);
+
+                // Prepare forecast data for chart
+                const forecastLabels = data.predictions.map(item => item.date);
+                const forecastValues = data.predictions.map(item => item.predicted_close);
+
+                // Destroy previous charts if exist
+                if (historicChart) historicChart.destroy();
+                if (forecastChart) forecastChart.destroy();
+
+                // Render historic chart
+                historicChart = new Chart(historicCtx, {
+                    type: 'line',
+                    data: {
+                        labels: historicLabels,
+                        datasets: [{
+                            label: 'Historic Close Price',
+                            data: historicValues,
+                            borderColor: '#4A90E2',
+                            backgroundColor: 'rgba(74, 144, 226, 0.2)',
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 4,
+                            pointHoverRadius: 7,
+                            pointHoverBackgroundColor: '#FFD700',
+                            pointHoverBorderColor: '#FFD700',
+                            pointHoverBorderWidth: 2,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: { display: true, title: { display: true, text: 'Date' } },
+                            y: { display: true, title: { display: true, text: 'Price (USD)' } }
+                        },
+                        plugins: {
+                            legend: { labels: { color: '#FFD700' } },
+                            tooltip: { enabled: true, mode: 'nearest', intersect: false }
+                        }
+                    }
+                });
+
+                // Render forecast chart
+                forecastChart = new Chart(forecastCtx, {
+                    type: 'line',
+                    data: {
+                        labels: forecastLabels,
+                        datasets: [{
+                            label: 'Predicted Close Price',
+                            data: forecastValues,
+                            borderColor: '#F5A623',
+                            backgroundColor: 'rgba(245, 166, 35, 0.2)',
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 4,
+                            pointHoverRadius: 7,
+                            pointHoverBackgroundColor: '#FFD700',
+                            pointHoverBorderColor: '#FFD700',
+                            pointHoverBorderWidth: 2,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: { display: true, title: { display: true, text: 'Date' } },
+                            y: { display: true, title: { display: true, text: 'Price (USD)' } }
+                        },
+                        plugins: {
+                            legend: { labels: { color: '#FFD700' } },
+                            tooltip: { enabled: true, mode: 'nearest', intersect: false }
+                        }
+                    }
+                });
+
+                resultDiv.innerHTML = '';
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>
