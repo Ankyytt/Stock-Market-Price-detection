@@ -56,3 +56,6 @@ python train.py
 - Add MLflow experiment tracking
 - Set up Airflow DAGs for scheduled retraining
 - Develop deployment with FastAPI or Streamlit
+
+<img width="620" height="882" alt="image" src="https://github.com/user-attachments/assets/156bf84c-4f0c-4f16-a5e3-d2110636128e" />
+
